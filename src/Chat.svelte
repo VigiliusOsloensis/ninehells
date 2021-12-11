@@ -6,7 +6,7 @@
   import debounce from 'lodash.debounce';
 
   import GUN from 'gun';
-  const db = GUN(['https://shielded-headland-05816.herokuapp.com/gun']);
+  const db = GUN(['https://shielded-headland-05816.herokuapp.com']);
 
   let newMessage;
   let messages = [];
