@@ -3,14 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "start": "node server.js",
+    "build": "ng build --prod",
     "test": "ng test",
-    "postinstall": "ng build --aot --prod"
+    "lint": "ng lint",
+    "e2e": "ng e2e",
+    "postinstall": "ng build --aot --prod",
+    "watch": "ng build --watch --configuration development"
   },
   "private": true,
-  "engine": {
+  "engines": {
     "node": "14.17.5",
     "npm": "6.14.14"
   },
