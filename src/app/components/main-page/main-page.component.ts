@@ -29,12 +29,19 @@ export class MainPageComponent implements OnInit {
     });
     this.chatService.joinRoom(this._pageName);
     this.chatService.getNewMessage().subscribe((message: string) => {
-      this.messageList.push(message);
+      this.appendMessageList(message);
     })
   }
 
   ngOnDestroy() {
     this.chatService.disconnect();
+  }
+
+  appendMessageList(msg: string) {
+    if(!msg || !(msg.trim())) {
+      return;
+    }
+    this.messageList.push(msg);
   }
 
   capitalise(input: string): string {
