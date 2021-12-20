@@ -1,6 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatServiceService } from 'src/app/services/chat-service.service';
-import { FormsModule } from '@angular/forms';
 import ChatMessage from 'src/app/types/chat-message';
 import { ActivatedRoute } from '@angular/router';
 
@@ -14,6 +13,7 @@ export class MainPageComponent implements OnInit {
   private sub: any;
   private _pageName: string = "avernus";
   currentChatMessage: string = "";
+  @ViewChild('messages', {static: false}) messageContainer!: ElementRef;
   messageList: string[] = [];
 
   constructor(private route: ActivatedRoute, private chatService: ChatServiceService) { }
@@ -30,6 +30,9 @@ export class MainPageComponent implements OnInit {
     this.chatService.joinRoom(this._pageName);
     this.chatService.getNewMessage().subscribe((message: string) => {
       this.appendMessageList(message);
+      console.log(this.messageContainer)
+      const height = (this.messageContainer) ? this.messageContainer.nativeElement.offsetHeight + this.messageContainer.nativeElement.offsetTop: 0;
+      window.scrollTo(0, height);
     })
   }
 
