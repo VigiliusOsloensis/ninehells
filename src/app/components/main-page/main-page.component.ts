@@ -13,7 +13,7 @@ export class MainPageComponent implements OnInit {
   private sub: any;
   private _pageName: string = "avernus";
   currentChatMessage: string = "";
-  @ViewChild('messages', {static: false}) messageContainer!: ElementRef;
+  @ViewChild('mainpage', {static: false}) messageContainer!: ElementRef;
   messageList: string[] = [];
 
   constructor(private route: ActivatedRoute, private chatService: ChatServiceService) { }
@@ -30,10 +30,30 @@ export class MainPageComponent implements OnInit {
     this.chatService.joinRoom(this._pageName);
     this.chatService.getNewMessage().subscribe((message: string) => {
       this.appendMessageList(message);
-      console.log(this.messageContainer)
-      const height = (this.messageContainer) ? this.messageContainer.nativeElement.offsetHeight + this.messageContainer.nativeElement.offsetTop: 0;
-      window.scrollTo(0, height);
+      this.scrollToBottom();
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 250); 
     })
+  }
+
+  scrollToBottom() {
+    try {
+      console.log(this.messageContainer);
+      if(this.messageContainer && this.messageContainer.nativeElement) {
+        console.log(this.messageContainer.nativeElement);
+        let list = this.messageContainer.nativeElement.children[0].children;
+        console.log(list);
+        let offset = 0;
+        if(list.length !== 0) {
+          offset += list[0].scrollHeight;
+        }
+        console.log(`${this.messageContainer.nativeElement.scrollHeight}`)
+        this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+      }
+    } catch( err ) {
+      console.error(err);
+    }
   }
 
   ngOnDestroy() {

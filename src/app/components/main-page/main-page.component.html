@@ -1,9 +1,7 @@
-<div id="mainPage">
-    <h1 style="text-align: center;">{{ pageName }}</h1>
-    <div id="messages" style="vertical-align: bottom;" #messages>
+<div id="mainpage" #mainpage>
+    <div id="messages" style="vertical-align: bottom;">
         <li *ngFor="let message of messageList" [innerHTML]='message' ></li>  
     </div>
-    <ul id="messages"></ul>
     <form id="form" action="">
         <button (click)="sendMsg()" [disabled]="currentChatMessage === ''">Send</button>
         <input id="input" [(ngModel)]="currentChatMessage" name="chatTextField" autocomplete="off" />
