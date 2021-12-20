@@ -1,6 +1,6 @@
 <div id="mainPage">
     <h1 style="text-align: center;">{{ pageName }}</h1>
-    <div id="messages" style="vertical-align: bottom;">
+    <div id="messages" style="vertical-align: bottom;" #messages>
         <li *ngFor="let message of messageList" [innerHTML]='message' ></li>  
     </div>
     <ul id="messages"></ul>
@@ -9,4 +9,3 @@
         <input id="input" [(ngModel)]="currentChatMessage" name="chatTextField" autocomplete="off" />
     </form>
 </div>
-
