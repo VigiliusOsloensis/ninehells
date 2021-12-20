@@ -1,4 +1,7 @@
 credentials.js
+credentials.json
+credentials**
+
 # Logs
 logs
 *.log
