@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatServiceService } from 'src/app/services/chat-service.service';
 import ChatMessage from 'src/app/types/chat-message';
 import { ActivatedRoute } from '@angular/router';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-main-page',
@@ -24,11 +25,13 @@ export class MainPageComponent implements OnInit {
 
   ngOnInit() {
     this.sub = this.route.params.subscribe(params => {
-      this._pageName = this.capitalise(params["pageName"]);
+      this._pageName = this.chatService.capitalise(params["pageName"]);
       console.log(`Page name: ${this._pageName}`);
     });
     this.chatService.joinRoom(this._pageName);
-    this.chatService.getNewMessage().subscribe((message: string) => {
+    this.chatService.getNewMessage().subscribe((message: ChatMessage) => {
+      console.log(`RECEIVED MESSAGE`)
+      console.log(message);
       this.appendMessageList(message);
       this.scrollToBottom();
       setTimeout(() => {
@@ -39,16 +42,15 @@ export class MainPageComponent implements OnInit {
 
   scrollToBottom() {
     try {
-      console.log(this.messageContainer);
       if(this.messageContainer && this.messageContainer.nativeElement) {
-        console.log(this.messageContainer.nativeElement);
+        if(!this.messageContainer.nativeElement.children || !this.messageContainer.nativeElement.children.length) {
+          return;
+        }
         let list = this.messageContainer.nativeElement.children[0].children;
-        console.log(list);
         let offset = 0;
         if(list.length !== 0) {
           offset += list[0].scrollHeight;
         }
-        console.log(`${this.messageContainer.nativeElement.scrollHeight}`)
         this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
       }
     } catch( err ) {
@@ -60,29 +62,29 @@ export class MainPageComponent implements OnInit {
     this.chatService.disconnect();
   }
 
-  appendMessageList(msg: string) {
-    if(!msg || !(msg.trim())) {
+  appendMessageList(msg: ChatMessage) {
+    console.log("appendMessageList");
+    console.log(msg);
+    if(!msg || !msg.message || !(msg.message.trim())) {
       return;
     }
-    this.messageList.push(msg);
+    const avatar = `https://avatars.dicebear.com/api/adventurer-neutral/${msg.user}.svg`
+    const md = new Date();
+    const messageDate = moment(md).format('DD/MM/YY hh:mm:ss');
+    const messageTime = moment(md).format('hh:mm')
+    let message = `<img class="avatar" src="${avatar}" title="${messageDate}" width="40px"> ${messageTime} ${msg.message}`;
+    this.messageList.push(message);
   }
 
-  capitalise(input: string): string {
-    if(!input) {
-      return '';
-    }
-    return input[0].toUpperCase() + input.substring(1);
-  }
+
 
   sendMsg() {
     if(!this.currentChatMessage) {
       return;
     }
-    let msg: ChatMessage = {
-      room: this._pageName,
-      user: "user",
-      message: this.currentChatMessage,
-    }
+    let msg = new ChatMessage(this._pageName, "user", this.currentChatMessage);
+    console.log("sendMsg");
+    console.log(msg);
     this.chatService.publishMessage(msg, (callback: Function) => { console.log("ACKNOWLEDGEMENT " + callback)});
     this.currentChatMessage = '';
   }
