@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import ChatMessage from '../types/chat-message';
 import { environment } from './../../environments/environment'
 
@@ -12,9 +12,21 @@ const defaultChatMessage = new ChatMessage();
 export class ChatServiceService {
 
   public message$: BehaviorSubject<ChatMessage> = new BehaviorSubject(defaultChatMessage);
-  socket = io(environment.apiUrl)
+  private socket!: Socket;
 
   constructor() { }
+
+  async login() {
+    this.socket = io(environment.apiUrl);    
+  }
+
+  loggedIn(): boolean {
+    return !!(this.socket);
+  }
+
+  logout() {
+    this.socket && this.socket.disconnect();
+  }
 
   capitalise(input: string): string {
     if(!input) {

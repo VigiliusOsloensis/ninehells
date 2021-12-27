@@ -4,6 +4,7 @@
     </div>
     <form id="form" action="">
         <button (click)="sendMsg()" [disabled]="currentChatMessage === ''">Send</button>
-        <input id="input" [(ngModel)]="currentChatMessage" name="chatTextField" autocomplete="off" />
+        <input id="input" [(ngModel)]="currentChatMessage" name="chatTextField" [readonly]="!loggedIn()" autocomplete="off" />
+        <button (click)="login()">Login</button>
     </form>
 </div>

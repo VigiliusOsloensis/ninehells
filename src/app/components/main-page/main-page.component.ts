@@ -1,7 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatServiceService } from 'src/app/services/chat-service.service';
 import ChatMessage from 'src/app/types/chat-message';
-import { ActivatedRoute } from '@angular/router';
 import * as moment from 'moment';
 
 @Component({
@@ -17,27 +16,17 @@ export class MainPageComponent implements OnInit {
   @ViewChild('mainpage', {static: false}) messageContainer!: ElementRef;
   messageList: string[] = [];
 
-  constructor(private route: ActivatedRoute, private chatService: ChatServiceService) { }
+  constructor(private chatService: ChatServiceService) { }
 
   public get pageName(): string {
     return this._pageName;
   }
 
+  public loggedIn(): boolean {
+    return this.chatService.loggedIn();
+  }
+
   ngOnInit() {
-    this.sub = this.route.params.subscribe(params => {
-      this._pageName = this.chatService.capitalise(params["pageName"]);
-      console.log(`Page name: ${this._pageName}`);
-    });
-    this.chatService.joinRoom(this._pageName);
-    this.chatService.getNewMessage().subscribe((message: ChatMessage) => {
-      console.log(`RECEIVED MESSAGE`)
-      console.log(message);
-      this.appendMessageList(message);
-      this.scrollToBottom();
-      setTimeout(() => {
-        this.scrollToBottom();
-      }, 250); 
-    })
   }
 
   scrollToBottom() {
@@ -76,7 +65,19 @@ export class MainPageComponent implements OnInit {
     this.messageList.push(message);
   }
 
-
+  async login() {
+    await this.chatService.login();
+    this.chatService.joinRoom(this._pageName);
+    this.chatService.getNewMessage().subscribe((message: ChatMessage) => {
+      console.log(`RECEIVED MESSAGE`)
+      console.log(message);
+      this.appendMessageList(message);
+      this.scrollToBottom();
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 250); 
+    })
+  }
 
   sendMsg() {
     if(!this.currentChatMessage) {
