@@ -36,7 +36,7 @@ export class ChatServiceService {
   }
 
   publishMessage(msg: ChatMessage, callback: Function) {
-    this.socket.emit("message", {msg: msg.message, roomName: msg.room}, callback);
+    this.socket.emit("message", {msg: msg.message, roomName: msg.room, usr: msg.user}, callback);
   }
 
   joinRoom = (roomName: string) => {

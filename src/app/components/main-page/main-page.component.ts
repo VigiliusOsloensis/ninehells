@@ -2,6 +2,13 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatServiceService } from 'src/app/services/chat-service.service';
 import ChatMessage from 'src/app/types/chat-message';
 import * as moment from 'moment';
+import Web3 from 'web3';
+
+declare global {
+  interface Window {
+      ethereum: any;
+  }
+}
 
 @Component({
   selector: 'app-main-page',
@@ -12,9 +19,11 @@ export class MainPageComponent implements OnInit {
 
   private sub: any;
   private _pageName: string = "avernus";
+  private _address!: string;
   currentChatMessage: string = "";
   @ViewChild('mainpage', {static: false}) messageContainer!: ElementRef;
   messageList: string[] = [];
+  web3Provider:any = null;
 
   constructor(private chatService: ChatServiceService) { }
 
@@ -28,6 +37,28 @@ export class MainPageComponent implements OnInit {
 
   ngOnInit() {
   }
+
+  public signInWithMetaMask() {
+    let ethereum = window.ethereum;
+    if (typeof ethereum !== 'undefined') {
+      console.log('MetaMask is installed!');
+    } else {
+      alert("The MetaMask extension is missing.\n\nGet it at https://metamask.io");
+      return;
+    }
+    if (ethereum) {
+      this.web3Provider = ethereum;
+      try {
+        // Request account access
+        ethereum.request({ method: 'eth_requestAccounts' }).then( (address:any) => {
+          console.log("Account connected: ", address[0]); // Account address that you had imported
+          this.loginAfterMetaMask(address[0]);
+        });
+      } catch (error) {
+        // User denied account access...
+        console.error("User denied account access");
+      }
+    }  }
 
   scrollToBottom() {
     try {
@@ -66,6 +97,16 @@ export class MainPageComponent implements OnInit {
   }
 
   async login() {
+    this.signInWithMetaMask();
+  }
+
+  async loginAfterMetaMask(address: string) {
+    if(!address) {
+      console.log("address is empty, stopping");
+      return;
+    }
+    console.log("logging in");
+    this._address = address;
     await this.chatService.login();
     this.chatService.joinRoom(this._pageName);
     this.chatService.getNewMessage().subscribe((message: ChatMessage) => {
@@ -83,7 +124,7 @@ export class MainPageComponent implements OnInit {
     if(!this.currentChatMessage) {
       return;
     }
-    let msg = new ChatMessage(this._pageName, "user", this.currentChatMessage);
+    let msg = new ChatMessage(this._pageName, this._address, this.currentChatMessage);
     console.log("sendMsg");
     console.log(msg);
     this.chatService.publishMessage(msg, (callback: Function) => { console.log("ACKNOWLEDGEMENT " + callback)});
